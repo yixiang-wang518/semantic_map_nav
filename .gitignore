@@ -1,0 +1,9 @@
+*.pyc
+__pycache__/
+*.swp
+*.bak
+.DS_Store
+build/
+devel/
+catkin_ws/
+*.log

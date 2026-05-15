@@ -1,0 +1,30 @@
+{
+  "charging_station_1": {
+    "x": 2.0,
+    "y": 3.0,
+    "yaw": 0.0,
+    "tag_type": "charging_station",
+    "description": "Main charging station"
+  },
+  "entrance_main": {
+    "x": 0.0,
+    "y": 0.0,
+    "yaw": 3.14159,
+    "tag_type": "entrance",
+    "description": "Main entrance"
+  },
+  "danger_zone_1": {
+    "x": -2.0,
+    "y": 2.0,
+    "yaw": 0.0,
+    "tag_type": "danger_zone",
+    "description": "Construction area"
+  },
+  "meeting_room": {
+    "x": 4.0,
+    "y": -1.0,
+    "yaw": 1.5708,
+    "tag_type": "goal",
+    "description": "Meeting room entrance"
+  }
+}

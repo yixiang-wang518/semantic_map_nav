@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find semantic_map)/launch/semantic_map.launch" />
+    
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find semantic_map)/config/semantic_map.rviz" output="screen" />
+</launch>

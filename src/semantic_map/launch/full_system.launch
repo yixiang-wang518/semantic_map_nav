@@ -1,0 +1,7 @@
+<launch>
+    <arg name="map_file" default="$(find semantic_map)/data/map.yaml" />
+    
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen" />
+    
+    <include file="$(find semantic_map)/launch/semantic_map_with_rviz.launch" />
+</launch>

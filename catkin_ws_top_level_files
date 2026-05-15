@@ -1,0 +1,3 @@
+创建以下文件在semantic_map_nav目录下作为catkin工作区:
+- CMakeLists.txt (catkin顶层)
+- package.xml (可选)

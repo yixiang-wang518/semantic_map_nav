@@ -1,0 +1,83 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Name: Tool Properties
+  - Class: rviz/Views
+    Name: Views
+  - Class: rviz/Time
+    Name: Time
+Preferences:
+  PromptSaveOnExit: true
+Toolbars:
+  toolButtonStyle: 2
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Enabled: true
+      Name: Grid
+    - Class: rviz/Map
+      Enabled: true
+      Name: Map
+      Topic: /map
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Name: Semantic Tags
+      Topic: /semantic_map/markers
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+    - Class: rviz/SetInitialPose
+      Topic: /initialpose
+    - Class: rviz/SetGoal
+      Topic: /move_base_simple/goal
+  Value: true
+  Views:
+    Current:
+      Class: rviz/TopDownOrtho
+      Distance: 10
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Name: TopDownOrtho (rviz)
+      Near Clip Distance: 0.01
+      Pitch: 0.785398
+      Target Frame: <Fixed Frame>
+      Yaw: 0
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 800
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd00000004000000000000016a00000032fc0200000008fb000000012000000310000000100000002000000100000001c00000028fc0200000003fb00000001e0000002f0000000100000003000000100000001c00000028fc0200000002fb0000000120000004a0000000100000004000000100000002000000140000000100000008000000000000000100000001000000000000000000000002
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1200
+  X: 100
+  Y: 100

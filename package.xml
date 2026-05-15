@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>semantic_map_nav</name>
+  <version>1.0.0</version>
+  <description>Semantic Map Navigation Metapackage</description>
+  <maintainer email="user@example.com">User</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>semantic_map</exec_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
