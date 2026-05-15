@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   move_base_msgs
   visualization_msgs
   std_srvs
+  actionlib
+  actionlib_msgs
   message_generation
 )
 
@@ -16,14 +18,19 @@ add_service_files(
   AddSemanticTag.srv
   QuerySemanticTag.srv
   DeleteSemanticTag.srv
-  NavigateToSemanticTag.srv
   ListSemanticTags.srv
+)
+
+add_action_files(
+  FILES
+  NavigateToSemanticTag.action
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
   geometry_msgs
+  actionlib_msgs
 )
 
 catkin_package(
@@ -34,6 +41,8 @@ catkin_package(
   move_base_msgs
   visualization_msgs
   std_srvs
+  actionlib
+  actionlib_msgs
   message_runtime
 )
 

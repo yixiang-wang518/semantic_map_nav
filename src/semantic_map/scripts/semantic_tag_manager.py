@@ -14,13 +14,15 @@ class SemanticTagManager:
         rospy.init_node('semantic_tag_manager', anonymous=False)
         
         self.data_dir = rospy.get_param('~data_dir', os.path.join(os.path.dirname(__file__), '../data'))
-        self.data_file = os.path.join(self.data_dir, 'semantic_tags.json')
+        self.data_file = rospy.get_param('~data_file', os.path.join(self.data_dir, 'semantic_tags.json'))
+        self.auto_save_interval = rospy.get_param('~auto_save_interval', 30)
         
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
         
         self.tags = {}
         self.lock = threading.Lock()
+        self.save_timer = None
         
         self.load_tags()
         
@@ -31,10 +33,27 @@ class SemanticTagManager:
         
         self.tags_publisher = rospy.Publisher('/semantic_map/tags', String, queue_size=10, latch=True)
         
-        rospy.on_shutdown(self.save_tags)
+        rospy.on_shutdown(self.shutdown_handler)
+        
+        if self.auto_save_interval > 0:
+            self.start_auto_save()
+        
+        self.broadcast_tags()
         
         rospy.loginfo("Semantic Tag Manager node started")
+        rospy.loginfo(f"Auto-save interval: {self.auto_save_interval}s")
         
+    def start_auto_save(self):
+        self.save_timer = rospy.Timer(rospy.Duration(self.auto_save_interval), self.auto_save_callback)
+    
+    def auto_save_callback(self, event):
+        self.save_tags()
+    
+    def shutdown_handler(self):
+        if self.save_timer:
+            self.save_timer.shutdown()
+        self.save_tags()
+    
     def load_tags(self):
         if os.path.exists(self.data_file):
             try:
@@ -48,12 +67,13 @@ class SemanticTagManager:
             rospy.loginfo("No existing data file, starting with empty tag list")
     
     def save_tags(self):
-        try:
-            with open(self.data_file, 'w') as f:
-                json.dump(self.tags, f, indent=2)
-            rospy.loginfo(f"Saved {len(self.tags)} semantic tags to {self.data_file}")
-        except Exception as e:
-            rospy.logerr(f"Failed to save tags: {e}")
+        with self.lock:
+            try:
+                with open(self.data_file, 'w') as f:
+                    json.dump(self.tags, f, indent=2)
+                rospy.logdebug(f"Saved {len(self.tags)} semantic tags to {self.data_file}")
+            except Exception as e:
+                rospy.logerr(f"Failed to save tags: {e}")
     
     def handle_add_tag(self, req):
         with self.lock:

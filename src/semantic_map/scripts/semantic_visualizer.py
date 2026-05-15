@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 import json
+import math
 from std_msgs.msg import String
 from visualization_msgs.msg import Marker, MarkerArray
 from geometry_msgs.msg import Point
@@ -16,8 +17,14 @@ class SemanticVisualizer:
         self.tag_colors = {
             'charging_station': {'r': 0.0, 'g': 0.5, 'b': 1.0, 'a': 1.0},
             'entrance': {'r': 0.0, 'g': 1.0, 'b': 0.0, 'a': 1.0},
-            'danger_zone': {'r': 1.0, 'g': 0.0, 'b': 0.0, 'a': 1.0},
+            'danger_zone': {'r': 1.0, 'g': 0.0, 'b': 0.0, 'a': 0.8},
             'goal': {'r': 1.0, 'g': 1.0, 'b': 0.0, 'a': 1.0},
+            'waypoint': {'r': 0.5, 'g': 0.5, 'b': 0.5, 'a': 1.0},
+            'elevator': {'r': 0.8, 'g': 0.2, 'b': 0.8, 'a': 1.0},
+            'staircase': {'r': 0.6, 'g': 0.4, 'b': 0.2, 'a': 1.0},
+            'restroom': {'r': 0.9, 'g': 0.6, 'b': 0.8, 'a': 1.0},
+            'office': {'r': 0.2, 'g': 0.8, 'b': 0.8, 'a': 1.0},
+            'meeting_room': {'r': 0.6, 'g': 0.2, 'b': 0.8, 'a': 1.0},
             'default': {'r': 1.0, 'g': 0.8, 'b': 0.0, 'a': 1.0}
         }
         
@@ -26,6 +33,12 @@ class SemanticVisualizer:
             'entrance': '🚪',
             'danger_zone': '⚠️',
             'goal': '🎯',
+            'waypoint': '📍',
+            'elevator': '⬆️',
+            'staircase': '🪜',
+            'restroom': '🚻',
+            'office': '🏢',
+            'meeting_room': '🤝',
             'default': '📍'
         }
         
@@ -44,6 +57,34 @@ class SemanticVisualizer:
         
         for tag_name, tag_data in tags.items():
             tag_type = tag_data.get('tag_type', 'default')
+            color = self.tag_colors.get(tag_type, self.tag_colors['default'])
+            icon = self.tag_icons.get(tag_type, self.tag_icons['default'])
+            
+            if tag_type == 'danger_zone':
+                zone_marker = Marker()
+                zone_marker.header.frame_id = "map"
+                zone_marker.header.stamp = rospy.Time.now()
+                zone_marker.ns = "semantic_tags"
+                zone_marker.id = marker_id
+                zone_marker.type = Marker.CYLINDER
+                zone_marker.action = Marker.ADD
+                
+                zone_marker.pose.position.x = tag_data['x']
+                zone_marker.pose.position.y = tag_data['y']
+                zone_marker.pose.position.z = 0.02
+                zone_marker.pose.orientation.w = 1.0
+                
+                zone_marker.color.r = color['r']
+                zone_marker.color.g = color['g']
+                zone_marker.color.b = color['b']
+                zone_marker.color.a = 0.3
+                
+                zone_marker.scale.x = 2.0
+                zone_marker.scale.y = 2.0
+                zone_marker.scale.z = 0.05
+                
+                marker_array.markers.append(zone_marker)
+                marker_id += 1
             
             position_marker = Marker()
             position_marker.header.frame_id = "map"
@@ -58,7 +99,6 @@ class SemanticVisualizer:
             position_marker.pose.position.z = 0.0
             position_marker.pose.orientation.w = 1.0
             
-            color = self.tag_colors.get(tag_type, self.tag_colors['default'])
             position_marker.color.r = color['r']
             position_marker.color.g = color['g']
             position_marker.color.b = color['b']
@@ -70,6 +110,8 @@ class SemanticVisualizer:
             
             marker_array.markers.append(position_marker)
             marker_id += 1
+            
+            yaw = tag_data.get('yaw', 0.0)
             
             arrow_marker = Marker()
             arrow_marker.header.frame_id = "map"
@@ -83,8 +125,6 @@ class SemanticVisualizer:
             arrow_marker.pose.position.y = tag_data['y']
             arrow_marker.pose.position.z = 0.05
             
-            import math
-            yaw = tag_data.get('yaw', 0.0)
             arrow_marker.pose.orientation.z = math.sin(yaw / 2.0)
             arrow_marker.pose.orientation.w = math.cos(yaw / 2.0)
             
@@ -113,7 +153,6 @@ class SemanticVisualizer:
             text_marker.pose.position.z = 0.1
             text_marker.pose.orientation.w = 1.0
             
-            icon = self.tag_icons.get(tag_type, self.tag_icons['default'])
             text_marker.text = f"{icon} {tag_name}"
             
             text_marker.color.r = color['r']

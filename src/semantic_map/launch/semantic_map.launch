@@ -1,10 +1,13 @@
 <launch>
     <node name="semantic_tag_manager" pkg="semantic_map" type="semantic_tag_manager.py" output="screen">
         <param name="data_dir" value="$(find semantic_map)/data" />
+        <param name="data_file" value="$(find semantic_map)/data/semantic_tags.json" />
+        <param name="auto_save_interval" value="30" />
     </node>
     
     <node name="semantic_navigator" pkg="semantic_map" type="semantic_navigator.py" output="screen">
         <param name="navigation_timeout" value="300.0" />
+        <param name="danger_zone_radius" value="1.0" />
     </node>
     
     <node name="semantic_visualizer" pkg="semantic_map" type="semantic_visualizer.py" output="screen" />

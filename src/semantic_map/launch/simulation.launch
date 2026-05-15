@@ -1,0 +1,112 @@
+<launch>
+
+  <arg name="use_sim_time" default="true" />
+  <arg name="gui" default="true" />
+
+  <param name="/use_sim_time" value="$(arg use_sim_time)" />
+
+  <!-- 加载机器人URDF到参数服务器 -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro
+                  $(find myrobot)/urdf/myrobot.urdf.xacro"/>
+
+  <!-- 启动Gazebo，加载世界 -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find myrobot)/launch/myworld.world"/>
+    <arg name="paused"     value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui"        value="true"/>
+  </include>
+
+  <!-- 在Gazebo中生成机器人 -->
+  <node name="spawn_robot"
+        pkg="gazebo_ros"
+        type="spawn_model"
+        args="-urdf
+              -model myrobot
+              -param robot_description
+              -x 0 -y 0 -z 0.1"
+        output="screen"/>
+
+  <!-- 发布机器人状态 -->
+  <node name="robot_state_publisher"
+        pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        output="screen"/>
+
+  <!-- 发布关节状态 -->
+  <node name="joint_state_publisher"
+        pkg="joint_state_publisher"
+        type="joint_state_publisher"
+        output="screen"/>
+
+  <!-- 加载地图 -->
+  <node name="map_server"
+        pkg="map_server"
+        type="map_server"
+        args="$(find myrobot)/maps/mymap.yaml"
+        output="screen"/>
+
+  <!-- AMCL 定位 -->
+  <node name="amcl"
+        pkg="amcl"
+        type="amcl"
+        output="screen">
+    <param name="base_frame_id"       value="base_footprint"/>
+    <param name="odom_frame_id"       value="odom"/>
+    <param name="global_frame_id"     value="map"/>
+    <param name="initial_pose_x"      value="0.0"/>
+    <param name="initial_pose_y"      value="0.0"/>
+    <param name="initial_pose_a"      value="0.0"/>
+    <param name="min_particles"       value="500"/>
+    <param name="max_particles"       value="2000"/>
+    <param name="update_min_d"        value="0.1"/>
+    <param name="update_min_a"        value="0.1"/>
+    <param name="laser_max_range"     value="8.0"/>
+    <param name="laser_max_beams"     value="60"/>
+  </node>
+
+  <!-- move_base 导航栈 -->
+  <node name="move_base"
+        pkg="move_base"
+        type="move_base"
+        output="screen">
+    <param name="base_global_planner" value="navfn/NavfnROS"/>
+    <param name="base_local_planner"  value="dwa_local_planner/DWAPlannerROS"/>
+    <param name="controller_frequency" value="5.0"/>
+    <param name="controller_patience"  value="15.0"/>
+    <param name="planner_patience"     value="10.0"/>
+    <param name="recovery_behavior_enabled" value="true"/>
+    <rosparam file="$(find myrobot)/config/costmap_common_params.yaml"
+              command="load" ns="global_costmap"/>
+    <rosparam file="$(find myrobot)/config/costmap_common_params.yaml"
+              command="load" ns="local_costmap"/>
+    <rosparam file="$(find myrobot)/config/global_costmap_params.yaml"
+              command="load"/>
+    <rosparam file="$(find myrobot)/config/local_costmap_params.yaml"
+              command="load"/>
+    <rosparam file="$(find myrobot)/config/dwa_local_planner_params.yaml"  
+              command="load"/>
+  </node>
+
+  <!-- 语义地图系统 -->
+  <node name="semantic_tag_manager" pkg="semantic_map" type="semantic_tag_manager.py" output="screen">
+    <param name="data_dir" value="$(find semantic_map)/data" />
+    <param name="auto_save_interval" value="30" />
+  </node>
+
+  <node name="semantic_navigator" pkg="semantic_map" type="semantic_navigator.py" output="screen">
+    <param name="navigation_timeout" value="300.0" />
+    <param name="danger_zone_radius" value="1.0" />
+  </node>
+
+  <node name="semantic_visualizer" pkg="semantic_map" type="semantic_visualizer.py" output="screen" />
+
+  <!-- RViz with semantic map visualization -->
+  <node name="rviz"
+        pkg="rviz"
+        type="rviz"
+        args="-d $(find semantic_map)/config/semantic_map.rviz"
+        output="screen"/>
+
+</launch>
